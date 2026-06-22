@@ -1,155 +1,191 @@
 # Agentic AI BGV System
 
-A local demo for background verification after an HR offer release. It covers candidate acceptance, BGV form submission, vendor verification, AI-assisted issue handling, HR review, re-verification, and final decisioning.
+An automated, AI-augmented Background Verification (BGV) workflow system designed to streamline the verification pipeline after an HR offer release. It connects HR teams, candidates, and third-party verification vendors through a single, intelligent console.
 
-## Hackathon Pitch
+---
 
-Agentic AI BGV turns a messy HR background verification process into a guided workflow where AI summarizes vendor issues and drafts candidate communication, while HR stays in control of every decision.
+## 🌟 Pitch & Value Proposition
 
-For the quickest presentation path, read [HACKATHON_DEMO.md](HACKATHON_DEMO.md).
+Traditional background verification is a bottleneck for hiring teams. It involves endless back-and-forth emails, manually reviewing vendor discrepancy logs, chasing candidates for missing documents, and managing disconnected tools.
 
-## Tech Stack
+**Agentic AI BGV** turns this chaotic process into a structured, automated workflow:
+- **Intelligent Summaries**: AI evaluates vendor outcomes, highlights exact discrepancies, and assigns risk levels.
+- **Automated Communication**: AI automatically drafts personalized clarification requests to candidates, specifying what documents or responses are needed.
+- **HR-in-the-Loop**: HR retains full authority, reviewing and approving all draft emails and making the final hiring decisions.
+- **Real-Time Timelines**: Every milestone is logged in an audit trail for clear tracking.
 
-- FastAPI backend
-- Streamlit HR dashboard
-- SQLite local storage
-- SQLAlchemy and Pydantic
-- Demo-safe email and Microsoft Forms placeholders
-- Deterministic AI fallback for summaries and candidate email drafts
+---
 
-## Setup
+## 🔄 System Workflow
 
-```powershell
-cd "C:\Users\ashutosh\Documents\BGV Proccess Automation"
-Copy-Item .env.example .env
-.\scripts\install_deps.ps1
-.\.venv\Scripts\python.exe scripts\seed_demo.py
+```mermaid
+flowchart TD
+    A["HR releases offer letter by email"] --> B["Offer email includes Microsoft Form: Accept / Decline"]
+    B --> C{"Candidate accepts offer?"}
+    C -->|No| D["Process closed; BGV not started"]
+    C -->|Yes| E["System sends BGV process email"]
+    E --> F["Candidate submits BGV details and documents"]
+    F --> G["Details sent to BGV vendor"]
+    G --> H{"Vendor result"}
+    H -->|Clear| I["Completion email sent; BGV completed"]
+    H -->|Issue| J["AI summarizes issue and assigns risk"]
+    J --> K["AI drafts candidate email"]
+    K --> L["HR reviews draft"]
+    L -->|Changes needed| K
+    L -->|Approved| M["Candidate receives clarification request"]
+    M --> N["Candidate uploads correction or response"]
+    N --> O["Updated details sent to vendor"]
+    O --> P{"Re-verification result"}
+    P -->|Clear| I
+    P -->|Still issue| Q["AI updates risk summary"]
+    Q --> R["HR final decision: proceed, reject, or hold"]
 ```
 
-If PowerShell blocks script execution:
+---
 
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+## 🛠️ Tech Stack
+
+- **Backend**: FastAPI (Python 3.12+) — High-performance, asynchronous REST APIs with Swagger documentation.
+- **Dashboard**: Streamlit — Dynamic, reactive HR console for live demo and administration.
+- **Database**: SQLite & SQLAlchemy ORM — Local transactional and state tracking storage.
+- **Schemas**: Pydantic — Strict request/response validation and data serialization.
+- **Integrations**: Microsoft Graph API & Microsoft Forms — Production-ready hooks (with sandbox email fallbacks).
+- **AI Agent Core**: Rule-based AI Engine — Categorizes verification risks (`Low`, `Medium`, `High`) and drafts precise emails.
+
+---
+
+## 📂 Directory Structure
+
+Here is the structure of the project and what each component does:
+
+```text
+BGV Proccess Automation/
+│
+├── bgv_app/                    # FastAPI Backend Application
+│   ├── agents/                 # AI Agent logic & definitions
+│   │   ├── definitions.py      # Data structures for AI analysis
+│   │   └── runner.py           # Risk assessment and email drafting logic
+│   ├── integrations/           # Third-party integrations
+│   │   ├── gmail.py            # Local demo fallback mailer
+│   │   └── microsoft_forms.py  # MS Forms integration logic
+│   ├── routes/                 # FastAPI REST API Routers
+│   │   ├── agentic_bgv.py      # BGV core state machine endpoints
+│   │   ├── analysis.py         # AI analysis triggers
+│   │   ├── bgv.py              # Vendor status and tracking endpoints
+│   │   └── candidates.py       # Candidate onboarding endpoints
+│   ├── config.py               # Environment configuration loader
+│   ├── database.py             # SQLite connection & DB initialization
+│   ├── models.py               # SQLAlchemy database models
+│   ├── schemas.py              # Pydantic validation schemas
+│   └── main.py                 # FastAPI application entry point
+│
+├── dashboard/                  # Streamlit HR Console Application
+│   └── app.py                  # Live React-like HR UI dashboard
+│
+├── scripts/                    # PowerShell/Python utility scripts
+│   ├── check_ms_mail_config.py # Diagnostic script for Microsoft Graph
+│   ├── create_workflow_visual.py # Generates a static visual graph
+│   ├── install_deps.ps1        # Dependency installation script
+│   ├── run_api.ps1             # Backend startup script
+│   ├── run_dashboard.ps1       # Dashboard startup script
+│   ├── seed_demo.py            # SQLite database seeder
+│   └── test_ms_mail.py         # Real-world email testing utility
+│
+├── Dockerfile                  # Containerization template
+├── README.md                   # System documentation (this file)
+├── HACKATHON_DEMO.md           # Demo and pitch guide for judges
+└── requirements.txt            # Python dependencies
 ```
 
-## Run
+---
 
-Backend:
+## 🚀 Setup & Installation
 
+### Prerequisite Setup
+1. Open PowerShell and navigate to the project directory:
+   ```powershell
+   cd "C:\Users\ashutosh\Documents\BGV Proccess Automation"
+   ```
+2. Copy the sample environment file to `.env`:
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+3. Run the installation script to configure the virtual environment and install dependencies:
+   ```powershell
+   .\scripts\install_deps.ps1
+   ```
+   *Note: If PowerShell blocks script execution, run the following command first to bypass the restriction:*
+   ```powershell
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+   ```
+
+4. Seed the database with demo candidates and verification cases:
+   ```powershell
+   .\.venv\Scripts\python.exe scripts\seed_demo.py
+   ```
+
+---
+
+## 🏃 Running the Application
+
+To run the application, you need to start the backend API and the HR dashboard concurrently:
+
+### 1. Start the FastAPI Backend
+In your first terminal, run:
 ```powershell
 .\scripts\run_api.ps1
 ```
+- **API Health Check**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Interactive Swagger Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-Dashboard, in a second terminal:
-
+### 2. Start the Streamlit Dashboard
+In a second terminal, run:
 ```powershell
 .\scripts\run_dashboard.ps1
 ```
+- **HR Dashboard Portal**: [http://localhost:8501](http://localhost:8501) (or the URL outputted in the terminal)
 
-Open:
+---
 
-- API health: http://127.0.0.1:8000
-- API docs: http://127.0.0.1:8000/docs
-- Dashboard: Streamlit prints the local URL, usually http://localhost:8501
+## 📧 Configuring Microsoft Graph Email (Optional)
 
-## Configure Real Microsoft Email
+The application includes a real-world integration with the Microsoft Graph API. By default, it runs in sandbox demo mode (`GMAIL_DEMO_MODE=true` logs emails to the backend terminal). To send real emails:
 
-The app can send real email through Microsoft Graph. For hackathon demos, keep `GMAIL_DEMO_MODE=true` until your app registration is ready.
+1. Register an App in the **Microsoft Entra ID** portal (under App registrations).
+2. Assign the Application Permission `Mail.Send` to the application.
+3. Grant **Admin Consent** for the tenant.
+4. Generate a Client Secret and copy its **Value**.
+5. Update your local `.env` file:
+   ```env
+   GMAIL_DEMO_MODE=false
+   MS_TENANT_ID=your-tenant-id
+   MS_CLIENT_ID=your-client-id
+   MS_CLIENT_SECRET=your-client-secret
+   MS_SENDER_EMAIL=your-real-mailbox@yourdomain.com
+   ```
+6. Verify your mail settings:
+   ```powershell
+   .\.venv\Scripts\python.exe scripts\check_ms_mail_config.py
+   ```
+7. Send a test email:
+   ```powershell
+   .\.venv\Scripts\python.exe scripts\test_ms_mail.py --to your-email@yourdomain.com
+   ```
 
-1. Go to Azure Portal.
-2. Open `Microsoft Entra ID` > `App registrations` > `New registration`.
-3. Name it `Agentic BGV Mailer`.
-4. Choose `Accounts in this organizational directory only`.
-5. Register the app.
-6. Copy:
-   - `Application (client) ID`
-   - `Directory (tenant) ID`
-7. Open `Certificates & secrets` > `New client secret`.
-8. Copy the secret **Value** immediately.
-9. Open `API permissions` > `Add a permission` > `Microsoft Graph` > `Application permissions`.
-10. Add `Mail.Send`.
-11. Click `Grant admin consent`.
-12. Update `.env`:
+---
 
-```env
-GMAIL_DEMO_MODE=false
-MS_TENANT_ID=your-tenant-id
-MS_CLIENT_ID=your-client-id
-MS_CLIENT_SECRET=your-client-secret
-MS_SENDER_EMAIL=your-real-mailbox@yourdomain.com
-```
+## 🎯 Demo Scenarios & Walkthrough
 
-`MS_SENDER_EMAIL` must be a real mailbox in your Microsoft tenant. For example, use your developer account user email if it has an Exchange Online mailbox.
+Read [HACKATHON_DEMO.md](HACKATHON_DEMO.md) for full instructions on demonstrating the app.
 
-Important: `MS_CLIENT_SECRET` must be the client secret **Value**, not the secret ID. If you copied the secret ID, Microsoft Graph returns `AADSTS7000215: Invalid client secret provided`.
+### Scenario A: Clean Verification Flow
+- **Onboard Candidate** -> **Candidate Accepts Offer** -> **Submit Documents** -> **Vendor Approves** -> **Status: Completed**.
 
-Validate your mail settings:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\check_ms_mail_config.py
-```
-
-Send a real test email:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\test_ms_mail.py --to your-email@yourdomain.com
-```
-
-Then restart the API:
-
-```powershell
-.\scripts\run_api.ps1
-```
-
-When HR actions trigger email, the backend calls Microsoft Graph:
-
-```text
-POST https://graph.microsoft.com/v1.0/users/{MS_SENDER_EMAIL}/sendMail
-```
-
-## Demo Flow
-
-Fastest judge demo:
-
-1. Seed demo data with `.\.venv\Scripts\python.exe scripts\seed_demo.py`.
-2. Open the dashboard.
-3. Select the seeded discrepancy case for Rohan Mehta.
-4. Show the AI risk summary and draft candidate email.
-5. Approve the draft.
-6. Add the candidate correction.
-7. Submit final vendor result as `Clear`.
-8. Show the timeline and completed status.
-
-Manual end-to-end demo:
-
-1. Add a candidate.
-2. Click `Send Offer Email`.
-3. Record the offer as accepted.
-4. Add a BGV document and submit it to the vendor.
-5. Submit a vendor result such as `Discrepancy`.
-6. Review the AI-generated risk summary and draft email.
-7. Approve the HR draft.
-8. Add the candidate correction.
-9. Submit a final vendor result such as `Clear`.
-10. Show the final case status as completed.
-
-## API Endpoints
-
-- `POST /candidates`
-- `GET /candidates`
-- `POST /agentic-bgv/cases`
-- `POST /agentic-bgv/cases/{case_id}/offer-response`
-- `POST /agentic-bgv/cases/{case_id}/documents`
-- `POST /agentic-bgv/cases/{case_id}/vendor-status`
-- `POST /agentic-bgv/cases/{case_id}/hr-review`
-- `POST /agentic-bgv/cases/{case_id}/candidate-response`
-- `GET /agentic-bgv/cases`
-- `GET /agentic-bgv/cases/{case_id}`
-
-## Visuals
-
-Generate the workflow visual:
-
-```powershell
-.\.venv\Scripts\python.exe scripts\create_workflow_visual.py
-```
+### Scenario B: AI Discrepancy Flow (Rohan Mehta)
+1. Select the seeded case for **Rohan Mehta** in the dashboard.
+2. Note the **AI Risk Assessment** (Medium Risk due to mismatched employment dates).
+3. Review the **AI-generated candidate email draft**.
+4. Click **Approve Draft** to simulate requesting clarification.
+5. Provide a candidate response (e.g. uploading corrected documents).
+6. Update vendor status to `Clear`.
+7. Verify the case transitions to `Completed` with a clean timeline history.
