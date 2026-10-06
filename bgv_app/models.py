@@ -27,6 +27,7 @@ class BGVCase(Base):
     status: Mapped[str] = mapped_column(String(80), default="offer_sent", index=True)
     offer_accepted: Mapped[bool | None] = mapped_column(Boolean)
     risk_level: Mapped[str | None] = mapped_column(String(40))
+    integrity_score: Mapped[int | None] = mapped_column(Integer, default=100)
     ai_summary: Mapped[str | None] = mapped_column(Text)
     ai_draft_email: Mapped[str | None] = mapped_column(Text)
     hr_notes: Mapped[str | None] = mapped_column(Text)
@@ -39,6 +40,7 @@ class BGVCase(Base):
     documents: Mapped[list["Document"]] = relationship(back_populates="case", cascade="all, delete-orphan")
     vendor_checks: Mapped[list["VendorCheck"]] = relationship(back_populates="case", cascade="all, delete-orphan")
     events: Mapped[list["WorkflowEvent"]] = relationship(back_populates="case", cascade="all, delete-orphan")
+    components: Mapped[list["VerificationComponent"]] = relationship(back_populates="case", cascade="all, delete-orphan")
 
 
 class Document(Base):
@@ -76,3 +78,18 @@ class WorkflowEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     case: Mapped[BGVCase] = relationship(back_populates="events")
+ 
+ 
+class VerificationComponent(Base):
+    __tablename__ = "verification_components"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    case_id: Mapped[int] = mapped_column(ForeignKey("bgv_cases.id"), nullable=False)
+    component_type: Mapped[str] = mapped_column(String(80), nullable=False)  # Identity, Employment, Education, Criminal, Address
+    status: Mapped[str] = mapped_column(String(50), default="Pending")  # Pending, In Progress, Clear, Discrepancy, Red Flag
+    severity: Mapped[str | None] = mapped_column(String(40), default="Low")  # None, Low, Medium, High, Critical
+    remarks: Mapped[str | None] = mapped_column(Text, default="")
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    case: Mapped[BGVCase] = relationship(back_populates="components")

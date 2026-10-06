@@ -69,6 +69,32 @@ class WorkflowEventRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class VerificationComponentCreate(BaseModel):
+    component_type: str
+    status: str = "Pending"
+    severity: str = "Low"
+    remarks: str = ""
+
+
+class VerificationComponentUpdate(BaseModel):
+    status: str
+    severity: str = "Low"
+    remarks: str = ""
+
+
+class VerificationComponentRead(BaseModel):
+    id: int
+    case_id: int
+    component_type: str
+    status: str
+    severity: str | None
+    remarks: str | None
+    verified_at: datetime | None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class CaseRead(BaseModel):
     id: int
     candidate_id: int
@@ -76,6 +102,7 @@ class CaseRead(BaseModel):
     status: str
     offer_accepted: bool | None
     risk_level: str | None
+    integrity_score: int | None = 100
     ai_summary: str | None
     ai_draft_email: str | None
     hr_notes: str | None
@@ -87,5 +114,22 @@ class CaseRead(BaseModel):
     documents: list[DocumentRead] = []
     vendor_checks: list[VendorCheckRead] = []
     events: list[WorkflowEventRead] = []
+    components: list[VerificationComponentRead] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class BGVReport(BaseModel):
+    report_id: str
+    generated_at: datetime
+    candidate_name: str
+    candidate_email: str
+    case_status: str
+    risk_level: str
+    integrity_score: int
+    final_decision: str | None
+    verification_components: list[VerificationComponentRead]
+    ai_summary: str | None
+    hr_notes: str | None
+    events: list[WorkflowEventRead]
+

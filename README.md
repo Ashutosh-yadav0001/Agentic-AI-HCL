@@ -1,18 +1,20 @@
 # Agentic AI BGV System
 
-An automated, AI-augmented Background Verification (BGV) workflow system designed to streamline the verification pipeline after an HR offer release. It connects HR teams, candidates, and third-party verification vendors through a single, intelligent console.
+An enterprise-grade, AI-augmented Background Verification (BGV) workflow automation system designed to streamline candidate verification after an HR offer release. It orchestrates HR teams, candidates, and third-party verification vendors through an intelligent, multi-track console.
 
 ---
 
 ## 🌟 Pitch & Value Proposition
 
-Traditional background verification is a bottleneck for hiring teams. It involves endless back-and-forth emails, manually reviewing vendor discrepancy logs, chasing candidates for missing documents, and managing disconnected tools.
+Traditional background verification is a major operational bottleneck for corporate hiring. It involves endless back-and-forth emails, manually reviewing disparate vendor discrepancy logs, chasing candidates for missing documents, and managing disconnected tools.
 
 **Agentic AI BGV** turns this chaotic process into a structured, automated workflow:
-- **Intelligent Summaries**: AI evaluates vendor outcomes, highlights exact discrepancies, and assigns risk levels.
-- **Automated Communication**: AI automatically drafts personalized clarification requests to candidates, specifying what documents or responses are needed.
-- **HR-in-the-Loop**: HR retains full authority, reviewing and approving all draft emails and making the final hiring decisions.
-- **Real-Time Timelines**: Every milestone is logged in an audit trail for clear tracking.
+- **5-Pillar Verification Tracks**: Granular tracking across Identity, Employment History, Education Credentials, Criminal/Court Records, and Address.
+- **Candidate Integrity Scoring (0–100%)**: Quantitative credibility scoring calculated dynamically from component statuses and discrepancy severities.
+- **Root-Cause & Policy Advisory AI**: Automatically detects tenure overlap, moonlighting, diploma mills, or address mismatches and recommends specific HR policy actions.
+- **Automated Candidate Clarification Packs**: AI generates itemized clarification checklists and ready-to-dispatch candidate emails.
+- **Formal Audit Dossier Generator**: One-click generation of tamper-evident, printable HTML/PDF-ready Background Verification Audit Certificates.
+- **HR-in-the-Loop Control**: HR retains full governance, reviewing drafts, requesting revisions, and executing the final hiring disposition.
 
 ---
 
@@ -23,64 +25,74 @@ flowchart TD
     A["HR releases offer letter by email"] --> B["Offer email includes Microsoft Form: Accept / Decline"]
     B --> C{"Candidate accepts offer?"}
     C -->|No| D["Process closed; BGV not started"]
-    C -->|Yes| E["System sends BGV process email"]
+    C -->|Yes| E["System sends BGV process email & inits 5 tracks"]
     E --> F["Candidate submits BGV details and documents"]
-    F --> G["Details sent to BGV vendor"]
-    G --> H{"Vendor result"}
-    H -->|Clear| I["Completion email sent; BGV completed"]
-    H -->|Issue| J["AI summarizes issue and assigns risk"]
-    J --> K["AI drafts candidate email"]
-    K --> L["HR reviews draft"]
+    F --> G["Details routed to 5 verification tracks"]
+    G --> H{"Vendor track results"}
+    H -->|All Clear| I["Integrity Score: 100/100; Formal BGV Certificate issued"]
+    H -->|Discrepancy / Flag| J["AI assesses multi-track severity & updates Integrity Score"]
+    J --> K["AI drafts itemized clarification checklist email"]
+    K --> L["HR reviews AI draft"]
     L -->|Changes needed| K
-    L -->|Approved| M["Candidate receives clarification request"]
-    M --> N["Candidate uploads correction or response"]
-    N --> O["Updated details sent to vendor"]
+    L -->|Approved| M["Candidate receives itemized clarification request"]
+    M --> N["Candidate uploads corrected evidence"]
+    N --> O["Updated evidence submitted for re-verification"]
     O --> P{"Re-verification result"}
     P -->|Clear| I
-    P -->|Still issue| Q["AI updates risk summary"]
-    Q --> R["HR final decision: proceed, reject, or hold"]
+    P -->|Persisting Issue| Q["AI updates risk dossier & policy recommendation"]
+    Q --> R["HR final decision: Proceed, Reject, or Hold"]
 ```
+
+---
+
+## 🧩 5-Pillar Verification Matrix
+
+| Track | Scope | Evidence Required | Risk Focus |
+|---|---|---|---|
+| **🆔 Identity Verification** | National ID, PAN, Aadhaar, Passport | Government Photo ID, DigiLocker | Identity fraud, typographical mismatches |
+| **💼 Employment History** | Past employers, tenure dates, designations | Relieving letters, EPFO service history, Form 26AS | Dual employment / Moonlighting, tenure overlap |
+| **🎓 Education Credentials** | University accreditation, degree validity | Degree certificate, consolidated marksheets | Unaccredited institutions, diploma mills |
+| **⚖️ Criminal & Court Checks** | Civil litigation, police records, high courts | Law enforcement registry, court checks | Adverse judicial records, criminal flags |
+| **📍 Address Verification** | Permanent & current residences | Registered rent agreement, utility bills | Geo-mismatch, fake address claims |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: FastAPI (Python 3.12+) — High-performance, asynchronous REST APIs with Swagger documentation.
-- **Dashboard**: Streamlit — Dynamic, reactive HR console for live demo and administration.
-- **Database**: SQLite & SQLAlchemy ORM — Local transactional and state tracking storage.
+- **Backend**: FastAPI (Python 3.12+) — High-performance asynchronous REST APIs with Swagger documentation.
+- **Dashboard**: Streamlit — Dynamic, interactive HR console with real-time KPI metrics, matrix editors, and report viewers.
+- **Database**: SQLite & SQLAlchemy ORM — Transactional state tracking and relational models.
 - **Schemas**: Pydantic — Strict request/response validation and data serialization.
-- **Integrations**: Microsoft Graph API & Microsoft Forms — Production-ready hooks (with sandbox email fallbacks).
-- **AI Agent Core**: Rule-based AI Engine — Categorizes verification risks (`Low`, `Medium`, `High`) and drafts precise emails.
+- **Integrations**: Microsoft Graph API & Microsoft Forms — Production-ready hooks (with demo-safe fallbacks).
+- **AI Agent Engine**: Multi-track compliance engine computing Integrity Scores, classifying risk types, and drafting itemized emails.
 
 ---
 
 ## 📂 Directory Structure
-
-Here is the structure of the project and what each component does:
 
 ```text
 BGV Proccess Automation/
 │
 ├── bgv_app/                    # FastAPI Backend Application
 │   ├── agents/                 # AI Agent logic & definitions
-│   │   ├── definitions.py      # Data structures for AI analysis
-│   │   └── runner.py           # Risk assessment and email drafting logic
+│   │   ├── definitions.py      # Data structures for AI analysis & scoring
+│   │   └── runner.py           # Integrity scoring, root-cause classification, email generation
 │   ├── integrations/           # Third-party integrations
 │   │   ├── gmail.py            # Local demo fallback mailer
 │   │   └── microsoft_forms.py  # MS Forms integration logic
 │   ├── routes/                 # FastAPI REST API Routers
-│   │   ├── agentic_bgv.py      # BGV core state machine endpoints
-│   │   ├── analysis.py         # AI analysis triggers
-│   │   ├── bgv.py              # Vendor status and tracking endpoints
+│   │   ├── agentic_bgv.py      # Core state machine, component endpoints & audit reports
+│   │   ├── analysis.py         # AI analysis & preview endpoints
+│   │   ├── bgv.py              # Vendor status & tracking endpoints
 │   │   └── candidates.py       # Candidate onboarding endpoints
 │   ├── config.py               # Environment configuration loader
 │   ├── database.py             # SQLite connection & DB initialization
-│   ├── models.py               # SQLAlchemy database models
-│   ├── schemas.py              # Pydantic validation schemas
+│   ├── models.py               # SQLAlchemy database models (Cases, Components, Events, Documents)
+│   ├── schemas.py              # Pydantic validation schemas & report models
 │   └── main.py                 # FastAPI application entry point
 │
 ├── dashboard/                  # Streamlit HR Console Application
-│   └── app.py                  # Live React-like HR UI dashboard
+│   └── app.py                  # Live HR UI dashboard with Verification Matrix & Audit Dossiers
 │
 ├── scripts/                    # PowerShell/Python utility scripts
 │   ├── check_ms_mail_config.py # Diagnostic script for Microsoft Graph
@@ -88,11 +100,12 @@ BGV Proccess Automation/
 │   ├── install_deps.ps1        # Dependency installation script
 │   ├── run_api.ps1             # Backend startup script
 │   ├── run_dashboard.ps1       # Dashboard startup script
-│   ├── seed_demo.py            # SQLite database seeder
-│   └── test_ms_mail.py         # Real-world email testing utility
+│   ├── seed_demo.py            # SQLite database seeder with 5-track demo cases
+│   ├── test_ms_mail.py         # Real-world email testing utility
+│   └── test_new_features.py    # Automated test suite for new features
 │
 ├── Dockerfile                  # Containerization template
-├── README.md                   # System documentation (this file)
+├── README.md                   # System documentation
 ├── HACKATHON_DEMO.md           # Demo and pitch guide for judges
 └── requirements.txt            # Python dependencies
 ```
@@ -114,12 +127,12 @@ BGV Proccess Automation/
    ```powershell
    .\scripts\install_deps.ps1
    ```
-   *Note: If PowerShell blocks script execution, run the following command first to bypass the restriction:*
+   *Note: If PowerShell blocks script execution, run the following command first:*
    ```powershell
    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
    ```
 
-4. Seed the database with demo candidates and verification cases:
+4. Seed the database with multi-track demo cases:
    ```powershell
    .\.venv\Scripts\python.exe scripts\seed_demo.py
    ```
@@ -127,8 +140,6 @@ BGV Proccess Automation/
 ---
 
 ## 🏃 Running the Application
-
-To run the application, you need to start the backend API and the HR dashboard concurrently:
 
 ### 1. Start the FastAPI Backend
 In your first terminal, run:
@@ -143,49 +154,32 @@ In a second terminal, run:
 ```powershell
 .\scripts\run_dashboard.ps1
 ```
-- **HR Dashboard Portal**: [http://localhost:8501](http://localhost:8501) (or the URL outputted in the terminal)
-
----
-
-## 📧 Configuring Microsoft Graph Email (Optional)
-
-The application includes a real-world integration with the Microsoft Graph API. By default, it runs in sandbox demo mode (`GMAIL_DEMO_MODE=true` logs emails to the backend terminal). To send real emails:
-
-1. Register an App in the **Microsoft Entra ID** portal (under App registrations).
-2. Assign the Application Permission `Mail.Send` to the application.
-3. Grant **Admin Consent** for the tenant.
-4. Generate a Client Secret and copy its **Value**.
-5. Update your local `.env` file:
-   ```env
-   GMAIL_DEMO_MODE=false
-   MS_TENANT_ID=your-tenant-id
-   MS_CLIENT_ID=your-client-id
-   MS_CLIENT_SECRET=your-client-secret
-   MS_SENDER_EMAIL=your-real-mailbox@yourdomain.com
-   ```
-6. Verify your mail settings:
-   ```powershell
-   .\.venv\Scripts\python.exe scripts\check_ms_mail_config.py
-   ```
-7. Send a test email:
-   ```powershell
-   .\.venv\Scripts\python.exe scripts\test_ms_mail.py --to your-email@yourdomain.com
-   ```
+- **HR Dashboard Portal**: [http://localhost:8501](http://localhost:8501)
 
 ---
 
 ## 🎯 Demo Scenarios & Walkthrough
 
-Read [HACKATHON_DEMO.md](HACKATHON_DEMO.md) for full instructions on demonstrating the app.
+### Scenario 1: Clean Verification (Anita Sharma)
+- Candidate accepted offer.
+- All 5 tracks verified clear.
+- **Integrity Score**: 100/100 (Low Risk).
+- Click **Audit Dossier** to view the official compliance clearance report.
 
-### Scenario A: Clean Verification Flow
-- **Onboard Candidate** -> **Candidate Accepts Offer** -> **Submit Documents** -> **Vendor Approves** -> **Status: Completed**.
+### Scenario 2: Address Mismatch Discrepancy (Rohan Mehta)
+- **Integrity Score**: 75/100 (Medium Risk).
+- Address verification flagged due to utility bill mismatch.
+- AI generated an itemized clarification pack requesting registered lease agreement or utility bill dated within 60 days.
+- HR approves draft, candidate submits correction, case clears upon re-verification.
 
-### Scenario B: AI Discrepancy Flow (Rohan Mehta)
-1. Select the seeded case for **Rohan Mehta** in the dashboard.
-2. Note the **AI Risk Assessment** (Medium Risk due to mismatched employment dates).
-3. Review the **AI-generated candidate email draft**.
-4. Click **Approve Draft** to simulate requesting clarification.
-5. Provide a candidate response (e.g. uploading corrected documents).
-6. Update vendor status to `Clear`.
-7. Verify the case transitions to `Completed` with a clean timeline history.
+### Scenario 3: High-Risk Moonlighting / Dual Employment (Priya Nair)
+- **Integrity Score**: 40/100 (High Risk).
+- Employment track flagged for concurrent salary credits and EPFO contributions.
+- AI outputs **Policy Alert [HR-3.2]** recommending Form 26AS cross-audit and escalation to Head of HR.
+- Case held pending ethics committee resolution.
+
+### Scenario 4: One-Click Vendor Simulation
+- Use the quick simulation buttons on the **Actions** tab to test:
+  - `✅ Simulate All Clear`
+  - `⚠️ Simulate Discrepancy`
+  - `🚨 Simulate Critical Red Flag`
